@@ -33,98 +33,54 @@ title('Conductivity Map');
 
 
 %Matrix G
-
 for i = 1:x
-    for j = 1:y
+    
+    for j = 1: y
+        n = j+ (i-1) *y;
         
-        n = j+(i-1) *y;
-        
-        if i==x
+        if (i == 1)
             G(n,:) = 0;
+            
+            G(n,n) = 1;
+            
+            V(1,n) = 1;
+            
+        elseif (i == x)
+            G(n,:) = 0;
+            
             G(n,n) = 1;
 
-        elseif i==1
-            G(n,:) = 0;  
-            G(n,n) = 1;
-            V(1,n) = 1; %Vo 
-        elseif j ==1 && i>1 && i<x
             
-            if i == box1(1)
-                G(n,n) = -3;
-                G(n,n+1) = conductivity2;
-                G(n,n+y) = conductivity2;
-                G(n,n-y) = conductivity1;  
-            elseif i ==box1(2)
-                G(n,n) = -3;
-                G(n,n+1) = conductivity2;
-                G(n,n+y) = conductivity1;
-                G(n,n-y) = conductivity2;  
-            elseif (i >box1(1) && i< box1(2))
-                G(n,n) = -3;
-                G(n,n+1) = conductivity2;
-                G(n,n+y) = conductivity2;
-                G(n,n-y) = conductivity2;  
-            else
-                G(n,n) = -3;
-                G(n,n+1) = conductivity1;
-                G(n,n+y) = conductivity1;
-                G(n,n-y) = conductivity1;  
-                
-            end
+        elseif ((i > 1) && (i < x) && (j==1))
             
-
+            G(n, n+y) = map(i+1,j);
             
-        elseif j ==y && i >1 && i <x
+            G(n,n) = -(map(i,j+1)+map(i-1,j)+map(i+1,j));
             
-            if i == box1(1)
-                G(n,n) = -3;
-                G(n, n-1) = conductivity2;
-                G(n,n+y) = conductivity2;
-                G(n,n-y) = conductivity1;
-            elseif i == box1(2)
-                G(n,n) = -3;
-                G(n, n-1) = conductivity2;
-                G(n,n+y) = conductivity1;
-                G(n,n-y) = conductivity2;
-            elseif(i >box1(1)&& i <box1(2))
-                G(n,n) = -3;
-                G(n, n-1) = conductivity2;
-                G(n,n+y) = conductivity2;
-                G(n,n-y) = conductivity2;
-            else
-                G(n,n) = -3;
-                G(n, n-1) = conductivity1;
-                G(n,n+y) = conductivity1;
-                G(n,n-y) = conductivity1;
-            end
+            G(n,n-y) = map(i-1,j);
+            
+            G(n,n-1) = map(i,j+1);
+            
+        elseif ((j == y) && (i < x) && (i >1))
+            G(n, n+y) = map(i+1,j);
+            
+            G(n,n) = -(map(i-1,j)+map(i+1,j)+map(i,j-1));
+            
+            G(n,n-y) = map(i-1,j);
+            
+            G(n,n+1) = map(i,j-1);
         else
-            if i == box1(1) && (j < box2(4) || (j > box1(4)))
-                G(n,n) = -4;
-                G(n,n+1) = conductivity2;  
-                G(n,n-1) = conductivity2;
-                G(n, n+y) = conductivity2;
-                G(n,n-y) = conductivity1;
-            elseif i == box1(2) && (j < box2(4) || (j > box1(4)))
-                G(n,n) = -4;
-                G(n,n+1) = conductivity2;  
-                G(n,n-1) = conductivity2;
-                G(n, n+y) = conductivity1;
-                G(n,n-y) = conductivity2;
-            elseif i > box1(1) && i <box1(2) && (j < box2(4) || (j > box1(4)))
-                G(n,n) = -4;
-                G(n,n+1) = conductivity2;  
-                G(n,n-1) = conductivity2;
-                G(n, n+y) = conductivity2;
-                G(n,n-y) = conductivity1;
-            else 
-                G(n,n) = -4;
-                G(n,n+1) = conductivity1;  
-                G(n,n-1) = conductivity1;
-                G(n, n+y) = conductivity1;
-                G(n,n-y) = conductivity1;
-            end      
+            G(n, n+y) = map(i+1,j);
+            
+            G(n,n) = -(map(i-1,j)+map(i+1,j)+map(i,j+1)+map(i,j-1));
+            
+            G(n,n-y) = map(i-1,j);
+            
+            G(n,n-1) = map(i,j+1);
+            
+            G(n,n+1) = map(i,j-1);
         end
-    end 
+    end
 end
 
 solution1 = G\V';
